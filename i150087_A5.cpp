@@ -9,6 +9,7 @@
 #include <iostream>
 using namespace std;
 class Nuron{
+public:
 Nuron(){
 cout<<" ------ "<<endl;
 cout<<"   NEW  "<<endl;
@@ -16,5 +17,6 @@ cout<<"   NEW  "<<endl;
 };
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+	Nuron A;
 	return 0;
 }
