@@ -8,8 +8,11 @@
 
 #include <iostream>
 using namespace std;
-class N{
-
+class Nuron{
+Nuron(){
+cout<<" ------ "<<endl;
+cout<<"   NEW  "<<endl;
+}
 };
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
