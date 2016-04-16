@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include<iomanip>
 #include "Point.h"
 using namespace std;
 class Neuron{
@@ -12,11 +13,12 @@ protected:
 	int connected;
 public:
 	Neuron(double x , double y , double att=1):position_(x,y){
+		signal_=0;
 		attenuation=att;
 		connected=0;
 		neighbours = new Neuron * [100];
 	}
-	void accumulate(double received_signal){
+	void virtual accumulate(double received_signal){
 		signal_=received_signal*attenuation;}
 	Point position(){
 		return position_;
@@ -28,7 +30,7 @@ public:
 		accumulate(rs);
 		propagate();
 	}
-	void propagate(){
+	void virtual propagate(){
 		for(int index=0;index<connected;index++){
 				neighbours[index]->fire(signal_);
 			}
@@ -52,6 +54,54 @@ ostream& operator << (ostream &out ,Neuron &N){
 	N.display();
 	return out;
 }
+
+
+
+class CumulativeNeuron : public Neuron{
+protected:
+	int total_incoming_connections;
+	int counter;
+
+
+public:
+	CumulativeNeuron(double x , double y , double att=1):Neuron(x,y,att){
+
+	}
+	void accumulate(double received_signal){
+		Neuron::accumulate(received_signal);
+		signal_= attenuation/(1+exp(-signal_));
+		for(int i=0;i<connected;i++){
+			signal_ = signal_ + neighbours[i]->signal();
+		}}
+	/*void  fire(double rs){
+			accumulate(rs);
+			propagate();
+		}*/
+	void propagate(){
+		for(int index=0;index<connected;index++){
+						neighbours[index]->fire(attenuation/(1+exp(-signal_)));
+					}
+		total_incoming_connections=0;
+	}
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int main ()
 {
   cout << "===== Test of 1st part  =====" << endl << endl;
@@ -75,15 +125,39 @@ int main ()
   // Test of  part 2
   cout << endl << "===== Test of 2nd part =====" << endl << endl;
 
-  Neuron neuron4(0, 0, 0.75);
+  CumulativeNeuron neuron4(0, 0, 0.75);
   cout << neuron4 << endl;
   neuron4.fire(10);
-  neuron4.fire(10);
+ neuron4.fire(10);
   cout << "Signal :" << endl;
-  cout << neuron4.signal() << endl;
+  cout <<setprecision(2)<< neuron4.signal() << endl;
 
   //Copy Paste the test code of Logical Gate OR
   cout << "===== Test of Logical gate \"or\"   =====" << endl << endl;
+
+
+  // Test of Logical OR Gate
+  cout << "===== Test of Logical gate \"or\" =====" << endl << endl;
+  // building the architecture...
+  // Here n1 and n2 will be our inputs, n0 will be always 1.
+  Neuron n0(2, 0, -10);
+  Neuron n1(1, 0, 20.0);
+  Neuron n2(0, 0, 20.0);
+  CumulativeNeuron n3(1, 3, 1); // will act as output
+  n0+=&n3;
+  n1+=&n3;
+  n2+=&n3;
+  // Now lets check the system.
+  n0.fire(1); // will always fire 1...
+  n1.fire(0);
+  n2.fire(1);
+  cout<< "If a=0 and b=1 then a|b == " << n3; //
+  n1.fire(1);
+  n2.fire(1);
+  cout<< "If a=1 and b=1 then a|b == " << n3;
+  n1.fire(0);
+  n2.fire(0);
+  cout<< "If a=0 and b=0 then a|b == " << n3; //
 
   // Add the code for other logical gates..
   cout << "===== Test of Logical gates \"And, etc\"   =====" << endl << endl;
