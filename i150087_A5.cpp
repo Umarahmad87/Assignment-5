@@ -35,7 +35,7 @@ public:
 				neighbours[index]->fire(signal_);
 			}
 	}
-	void operator += (Neuron *N){
+	void virtual operator += (Neuron *N){
 		neighbours[connected++]=N;}
 
 	void display() {
@@ -65,24 +65,27 @@ protected:
 
 public:
 	CumulativeNeuron(double x , double y , double att=1):Neuron(x,y,att){
-
+		total_incoming_connections=0;
+		counter=0;
 	}
+	void operator += (Neuron *N){
+			neighbours[connected++]=N;
+			counter++;}
 	void accumulate(double received_signal){
 		Neuron::accumulate(received_signal);
 		signal_= attenuation/(1+exp(-signal_));
-		for(int i=0;i<connected;i++){
+		/*for(int i=0;i<connected;i++){
 			signal_ = signal_ + neighbours[i]->signal();
-		}}
-	/*void  fire(double rs){
-			accumulate(rs);
-			propagate();
 		}*/
+	}
 	void propagate(){
 		for(int index=0;index<connected;index++){
-						neighbours[index]->fire(attenuation/(1+exp(-signal_)));
+						neighbours[index]->fire(signal_);
+
 					}
-		total_incoming_connections=0;
+		counter=0;
 	}
+	int Counter(){ return counter;}
 
 
 };
@@ -128,14 +131,8 @@ int main ()
   CumulativeNeuron neuron4(0, 0, 0.75);
   cout << neuron4 << endl;
   neuron4.fire(10);
- neuron4.fire(10);
   cout << "Signal :" << endl;
   cout <<setprecision(2)<< neuron4.signal() << endl;
-
-  //Copy Paste the test code of Logical Gate OR
-  cout << "===== Test of Logical gate \"or\"   =====" << endl << endl;
-
-
   // Test of Logical OR Gate
   cout << "===== Test of Logical gate \"or\" =====" << endl << endl;
   // building the architecture...
